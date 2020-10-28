@@ -4,7 +4,7 @@ proc {SemanticStack Stack Env SAS}
    of nil then skip
    [] H|T then case H
 	       of nil then skip
-	       [] [nop] then {Browse {Dictionary.entries Env}}{SemanticStack T Env SAS}
+	       [] [nop] then {SemanticStack T Env SAS}
 	       [] [var ident(X) S] then if {Dictionary.member Env X}
 					then local Env2 in
 						Env2={Dictionary.clone Env}
