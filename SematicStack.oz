@@ -32,3 +32,16 @@ end
 		] {Dictionary.new} nil}
 
 
+declare SAS AddToSAS RetriveFromSAS J
+SAS = {Dictionary.new}
+
+proc {AddToSAS X}
+   {Dictionary.put SAS X ec(value: nil es: [X])}
+end
+
+fun {RetriveFromSAS X}
+   local EC in
+      EC = {Dictionary.get SAS X}
+      if EC.value == nil then X else EC.value end
+   end
+end
