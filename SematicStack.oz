@@ -1,17 +1,35 @@
-declare
-proc {SemanticStack Stack Env SAS}
+\insert 'SingleAssignmentStore.oz'
+
+declare SemanticStack GetName
+
+fun {GetName X List}
+	if {Dictionary.member SAS X+List.1}
+	then {GetName X List.2}
+	else X+List.1
+	end
+end
+
+proc {SemanticStack Stack Env}
    case Stack
    of nil then skip
-   [] [nop] then skip %{Browse {Dictionary.entries Env}}
+   [] [nop] then skip 
    [] [var ident(X) S] then if {Dictionary.member Env X}
-			    then local Env2 in
-				    Env2={Dictionary.clone Env}
-				    {Dictionary.put Env2 X nil}
-				    {SemanticStack S Env2 SAS}
-				 end
-			    else {Dictionary.put Env X nil} {SemanticStack S Env SAS} {Dictionary.remove Env X}
-			    end
-   [] H|T then {SemanticStack H Env SAS} {SemanticStack T Env SAS}
+			    			then local Env2 in
+				    				Env2={Dictionary.clone Env}
+				    				local Name in
+				    					Name={GetName X {List.number 1 1000 1} }
+				    					{Dictionary.put Env2 X Name}
+				    					{AddToSAS Name}
+				    					{SemanticStack S Env2}
+				    				end
+								end
+			    			else local Name in
+			    					Name={GetName X {List.number 1 1000 1} }
+			    					{AddToSAS Name}
+			    					{Dictionary.put Env X Name} {SemanticStack S Env} {Dictionary.remove Env X}
+			    				 end
+			    			end
+   [] H|T then {SemanticStack H Env} {SemanticStack T Env}
    else skip
    end
 end
@@ -29,19 +47,4 @@ end
 		  ]
 		  [nop]
 		 ]
-		] {Dictionary.new} nil}
-
-
-declare SAS AddToSAS RetriveFromSAS J
-SAS = {Dictionary.new}
-
-proc {AddToSAS X}
-   {Dictionary.put SAS X ec(value: nil es: [X])}
-end
-
-fun {RetriveFromSAS X}
-   local EC in
-      EC = {Dictionary.get SAS X}
-      if EC.value == nil then X else EC.value end
-   end
-end
+		] {Dictionary.new} }		      
