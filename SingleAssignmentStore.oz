@@ -38,13 +38,13 @@ proc {BindRefToKeyInSAS X Y}
 	    end	% local
 	 end % if {List.member }
       else
-	 if EX.val \= nil then
+	 if EX.value \= nil then
 	    raise notUndefined(X) end
 	 end
-	 if EY.val \= nil then
+	 if EY.value \= nil then
 	    raise notUndefined(Y) end
 	 end
-      end % if Ex.val ==
+      end % if Ex.value ==
    end % local EX EY
 
    %Need to call Update SAS here also
@@ -59,14 +59,14 @@ fun {WeakSubstitute X}
 end
 
 proc {BindValueToKeyInSAS X E}
-   local Ex in 
+   local Ex in
       case E
       of literal(_) then
 	 Ex = {Dictionary.get X}
 	 if Ex.value == nil
 	 then
 	    {Dictionary.remove X}
-	    {Dictionary.put X ec(val:E es:Ex.es)}
+	    {Dictionary.put X ec(value:E es:Ex.es)}
 	 else
 	    raise notUndefined(X) end 
 	 end
@@ -76,9 +76,10 @@ proc {BindValueToKeyInSAS X E}
 	    local Canon CanonSub Rec in
 	       {Dictionary.remove X}
 	       Canon = {Canonize Pairs.1}
-	       CanonSub = {Map Canon fun {$ X} [X.1 {WeakSubstitute X.2.1}] end}
-	       Rec = [record L CanonSub]
-	       {Dictionary.put X ec(val:Rec es:[X])}
+	       %CanonSub = {Map Canon fun {$ X} {WeakSubstitute X.2.1}} 
+	       %Rec = [record L CanonSub]
+	       Rec = [record L Canon]
+	       {Dictionary.put X ec(value:Rec es:Ex.es)}
 	    end
 	 else
 	    raise notUndefined(X) end
@@ -113,16 +114,23 @@ fun {EqualExp E1 E2}
       case E2
       of record | !L | Pairs2 then
 	 local Canon1 Canon2 Vals in
-	    Canon1 = {Canonize Pairs1.1}
-	    Canon2 = {Canonize Pairs2.1}
-	    Vals =
-	    {List.zip Canon1 Canon2
-	     fun {$ X Y}
-		%Maybe more checks can be added here?
-		{EqualExp {WeakSubstitute X.2.1} {WeakSubstitute Y.2.1}}
-	     end
-	    }
-	    {FoldL Vals fun {$ X Y} X==Y end true}
+	    if {Length Canon1} == {Length Canon2} then
+	       Canon1 = {Canonize Pairs1.1}
+	       Canon2 = {Canonize Pairs2.1}
+	       Vals =
+	       {List.zip Canon1 Canon2
+		fun {$ X Y}
+		   if {EqualExp X.1 X.2} then
+		      {EqualExp {WeakSubstitute X.2.1} {WeakSubstitute Y.2.1}}
+		   else
+		      false
+		   end   
+		end
+	       }
+	       {FoldL Vals fun {$ X Y} X==Y end true}
+	    else
+	       false
+	    end % if Length
 	 end % local
       else 
 	 false
@@ -159,7 +167,7 @@ proc {MergeAllInSAS List}
 	    local Ex in
 	       Ex = {Dictionary.get SAS H}
 	       {Dictionary.remove SAS H}
-	       {Dictionary.put SAS H ec(val:Ex.val es:B)}
+	       {Dictionary.put SAS H ec(value:Ex.value es:B)}
 	    end
 	    {MergeAux T B}
 	 end %case A
