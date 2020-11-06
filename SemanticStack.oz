@@ -33,20 +33,3 @@ proc {SemanticStack Stack Env}
    end
 end
 
-{SemanticStack [var ident(x)
-		 [
-		  [var ident(y)
-		   [
-		    [
-		     var ident(x)
-		     [
-		      [bind ident(x) literal(2)]
-		      [nop]
-		     ]
-		    ]
-		    [nop]
-		   ]
-		  ]
-		  [nop]
-		 ]
-		] {Dictionary.new} }		      

@@ -140,12 +140,12 @@ proc {MergeIfEqual Xs Ys}
       skip
    else
       local Ex Ey in
-	 Ex = {RetrieveFromSAS Xs}
-	 Ey = {RetrieveFromSAS Ys}
+	 Ex = {Dictionary.get SAS Xs}
+	 Ey = {Dictionary.get SAS Ys}
 	 if {List.member Xs Ey.es} then
 	    skip
 	 else
-	    if {EqualExp Ex Ey} then
+	    if {EqualExp {RetrieveFromSAS Xs} {RetrieveFromSAS Ys}} then
 	       {MergeAllInSAS {Append Ex.es Ey.es}}
 	    else
 	       skip
