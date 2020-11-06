@@ -196,6 +196,4 @@ Test8 = [var ident(x)
 	 ]
 	]
 
-{Browse Test8}
-
-{RunTest Test6}
+{RunTest Test7}

@@ -11,10 +11,10 @@ proc {AddToSAS X}
    {Dictionary.put SAS X ec(value: nil es: [X])}
 end
 
-fun {RetriveFromSAS X}
+fun {RetrieveFromSAS X}
    local EC in
       EC = {Dictionary.get SAS X}
-      if EC.value == nil then X else EC.value end
+      if EC.value == nil then equivalence(X) else EC.value end
    end
 end
 
