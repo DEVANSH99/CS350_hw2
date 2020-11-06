@@ -45,10 +45,8 @@ proc {BindRefToKeyInSAS X Y}
 	 end
       end % if Ex.value ==
    end % local EX EY
-
-   %Need to call Update SAS here also
    {UpdateSAS}
-   
+   %Need to call Update SAS here also   
 end % proc
 
 fun {WeakSubstitute X}
@@ -61,24 +59,24 @@ proc {BindValueToKeyInSAS X E}
    local Ex in
       case E
       of literal(_) then
-	 Ex = {Dictionary.get X}
+	 Ex = {Dictionary.get SAS X}
 	 if Ex.value == nil
 	 then
-	    {Dictionary.remove X}
-	    {Dictionary.put X ec(value:E es:Ex.es)}
+	    {Dictionary.remove SAS X}
+	    {Dictionary.put SAS X ec(value:E es:Ex.es)}
 	 else
 	    raise notUndefined(X) end 
 	 end
       [] record | L | Pairs then
-	 Ex = {Dictionary.get X}
+	 Ex = {Dictionary.get SAS X}
 	 if Ex.value ==nil then
 	    local Canon CanonSub Rec in
-	       {Dictionary.remove X}
+	       {Dictionary.remove SAS X}
 	       Canon = {Canonize Pairs.1}
 	       %CanonSub = {Map Canon fun {$ X} {WeakSubstitute X.2.1}} 
 	       %Rec = [record L CanonSub]
 	       Rec = [record L Canon]
-	       {Dictionary.put X ec(value:Rec es:Ex.es)}
+	       {Dictionary.put SAS X ec(value:Rec es:Ex.es)}
 	    end
 	 else
 	    raise notUndefined(X) end
