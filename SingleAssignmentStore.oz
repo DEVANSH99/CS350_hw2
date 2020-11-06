@@ -1,4 +1,4 @@
-\insert 'Desktop/CS350_hw2/ProcessRecords.oz'
+\insert 'ProcessRecords.oz'
 
 declare SAS AddToSAS RetrieveFromSAS BindRefToKeyInSAS BindValueToKeyInSAS WeakSubstitute EqualExp MergeAllInSAS MergeIfEqual UpdateSAS
 
@@ -28,7 +28,6 @@ proc {BindRefToKeyInSAS X Y}
 		  case Xs
 		  of nil then skip
 		  else
-		     {Dictionary.remove Xs.1}
 		     {Dictionary.put SAS Xs.1 ec(value:nil es:List)}
 		     {SubsRefs Xs.2 List}
 		  end
