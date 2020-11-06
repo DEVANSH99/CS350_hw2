@@ -48,24 +48,3 @@ end
 		  [nop]
 		 ]
 ] {Dictionary.new} }
-
-
-declare SAS AddToSAS RetriveFromSAS J
-SAS = {Dictionary.new}
-
-proc {AddToSAS X}
-   {Dictionary.put SAS X ec(value: nil es: [X])}
-end
-
-fun {RetriveFromSAS X}
-   local EC in
-      EC = {Dictionary.get SAS X}
-      if EC.value == nil then equivelance(X)
-      else
-	 	case EC.value
-	 	of H|T then EC.value
-	 	else literal(EC.value)
-	 	end
-      end   
-   end
-end
