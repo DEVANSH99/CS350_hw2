@@ -101,7 +101,7 @@ in
    end % UnifyRecursive
 
    %========= Start Unification ======
-   {UnifyRecursive {SubstituteIdentifiers Expo Env}
+   {UnifyRecursive {SubstituteIdentifiers Exp1 Env}
     {SubstituteIdentifiers Exp2 Env} nil}
 end
 

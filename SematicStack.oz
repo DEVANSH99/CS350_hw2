@@ -10,7 +10,7 @@ end
 proc {SemanticStack Stack Env}
    case Stack
    of nil then skip
-   [] [nop] then skip 
+   [] [nop] then {Browse {Dictionary.entries SAS}} {Browse {Dictionary.entries Env}}
    [] [var ident(X) S] then if {Dictionary.member Env X}
 			    			then local Env2 in
 				    				Env2={Dictionary.clone Env}
@@ -39,7 +39,10 @@ end
 		   [
 		    [
 		     var ident(x)
-		     [nop]
+		     [
+		      [bind ident(x) ident(y)]
+		      [nop]
+		     ]
 		    ]
 		    [nop]
 		   ]
