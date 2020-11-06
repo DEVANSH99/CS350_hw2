@@ -49,10 +49,8 @@ proc {BindRefToKeyInSAS X Y}
 	 end
       end % if Ex.value ==
    end % local EX EY
-
-   %Need to call Update SAS here also
    {UpdateSAS}
-   
+   %Need to call Update SAS here also   
 end % proc
 
 fun {WeakSubstitute X}
