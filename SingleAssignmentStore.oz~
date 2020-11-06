@@ -1,9 +1,12 @@
-\insert 'Desktop/CS350_hw2/ProcessRecords.oz'
+\insert 'ProcessRecords.oz'
 
-declare SAS AddToSAS RetrieveFromSAS BindRefToKeyInSAS BindValueToKeyInSAS WeakSubstitute EqualExp MergeAllInSAS MergeIfEqual UpdateSAS
+declare SAS AddToSAS RetrieveFromSAS BindRefToKeyInSAS BindValueToKeyInSAS
+WeakSubstitute EqualExp MergeAllInSAS MergeIfEqual UpdateSAS
+PprintSAS
 
 SAS = {Dictionary.new}
 
+%Add a fresh variable to the SAS
 proc {AddToSAS X}
    {Dictionary.put SAS X ec(value: nil es: [X])}
 end
@@ -23,19 +26,19 @@ proc {BindRefToKeyInSAS X Y}
 	 if {List.member Y EX.es} then
 	    skip
 	 else
-	    local SubsRefs in
-	       proc {SubsRefs Xs List}
-		  case Xs
-		  of nil then skip
-		  else
-		     {Dictionary.remove Xs.1}
-		     {Dictionary.put SAS Xs.1 ec(value:nil es:List)}
-		     {SubsRefs Xs.2 List}
-		  end
-	       end
-	       {SubsRefs EX.es {Append EX.es EY.es}}
-	       {SubsRefs EY.es {Append EX.es EY.es}}
-	    end	% local
+	    {MergeAllInSAS nil {Append EX.es EY.es}}
+%	    local SubsRefs in
+%	       proc {SubsRefs Xs List}
+%		  case Xs
+%		  of nil then skip
+%		  else
+%		     {Dictionary.put SAS Xs.1 ec(value:nil es:List)}
+%		     {SubsRefs Xs.2 List}
+%		  end
+%	       end
+%	       {SubsRefs EX.es {Append EX.es EY.es}}
+%	       {SubsRefs EY.es {Append EX.es EY.es}}
+%	    end	% local
 	 end % if {List.member }
       else
 	 if EX.value \= nil then
@@ -46,10 +49,8 @@ proc {BindRefToKeyInSAS X Y}
 	 end
       end % if Ex.value ==
    end % local EX EY
-
-   %Need to call Update SAS here also
    {UpdateSAS}
-   
+   %Need to call Update SAS here also   
 end % proc
 
 fun {WeakSubstitute X}
@@ -62,24 +63,24 @@ proc {BindValueToKeyInSAS X E}
    local Ex in
       case E
       of literal(_) then
-	 Ex = {Dictionary.get X}
+	 Ex = {Dictionary.get SAS X}
 	 if Ex.value == nil
 	 then
-	    {Dictionary.remove X}
-	    {Dictionary.put X ec(value:E es:Ex.es)}
+        {MergeAllInSAS E Ex.es}
+	    %{Dictionary.put SAS X ec(value:E es:Ex.es)}
 	 else
 	    raise notUndefined(X) end 
 	 end
       [] record | L | Pairs then
-	 Ex = {Dictionary.get X}
+	 Ex = {Dictionary.get SAS X}
 	 if Ex.value ==nil then
 	    local Canon CanonSub Rec in
-	       {Dictionary.remove X}
 	       Canon = {Canonize Pairs.1}
 	       %CanonSub = {Map Canon fun {$ X} {WeakSubstitute X.2.1}} 
 	       %Rec = [record L CanonSub]
 	       Rec = [record L Canon]
-	       {Dictionary.put X ec(value:Rec es:Ex.es)}
+           {MergeAllInSAS Rec Ex.es}
+	       %{Dictionary.put SAS X ec(value:Rec es:Ex.es)}
 	    end
 	 else
 	    raise notUndefined(X) end
@@ -120,7 +121,7 @@ fun {EqualExp E1 E2}
 	       Vals =
 	       {List.zip Canon1 Canon2
 		fun {$ X Y}
-		   if {EqualExp X.1 X.2} then
+		   if X.1 == X.2 then
 		      {EqualExp {WeakSubstitute X.2.1} {WeakSubstitute Y.2.1}}
 		   else
 		      false
@@ -143,13 +144,13 @@ proc {MergeIfEqual Xs Ys}
       skip
    else
       local Ex Ey in
-	 Ex = {RetrieveFromSAS Xs}
-	 Ey = {RetrieveFromSAS Ys}
+	 Ex = {Dictionary.get SAS Xs}
+	 Ey = {Dictionary.get SAS Ys}
 	 if {List.member Xs Ey.es} then
 	    skip
 	 else
-	    if {EqualExp Ex Ey} then
-	       {MergeAllInSAS {Append Ex.es Ey.es}}
+	    if {EqualExp {RetrieveFromSAS Xs} {RetrieveFromSAS Ys}} then
+	       {MergeAllInSAS Ex.value {Append Ex.es Ey.es}}
 	    else
 	       skip
 	    end
@@ -158,7 +159,7 @@ proc {MergeIfEqual Xs Ys}
    end
 end
 
-proc {MergeAllInSAS List}
+proc {MergeAllInSAS Value List}
    local
       proc {MergeAux A B}
 	 case A
@@ -167,7 +168,7 @@ proc {MergeAllInSAS List}
 	    local Ex in
 	       Ex = {Dictionary.get SAS H}
 	       {Dictionary.remove SAS H}
-	       {Dictionary.put SAS H ec(value:Ex.value es:B)}
+	       {Dictionary.put SAS H ec(value:Value es:B)}
 	    end
 	    {MergeAux T B}
 	 end %case A
@@ -202,3 +203,21 @@ proc {UpdateSAS}
       {Outer {Dictionary.keys SAS}}
    end % local outer
 end
+
+proc {PprintSAS}
+   local
+      proc {P L}
+	 case L
+	 of nil then skip
+	 [] H|T then
+	    {Browse entry(k:H v:{Dictionary.get SAS H})}
+	    {P T}
+	 end
+      end
+   in
+      {Browse '=========Printing SAS==========='}
+      {P {Dictionary.keys SAS}}
+      {Browse '================================'}
+   end   
+end
+
