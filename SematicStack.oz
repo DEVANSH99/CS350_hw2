@@ -42,6 +42,12 @@ end
 fun {RetriveFromSAS X}
    local EC in
       EC = {Dictionary.get SAS X}
-      if EC.value == nil then X else EC.value end
+      if EC.value == nil then equivelance(X)
+      else
+	 	case EC.value
+	 	of H|T then EC.value
+	 	else literal(EC.value)
+	 	end
+      end   
    end
 end
