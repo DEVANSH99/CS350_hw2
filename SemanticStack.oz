@@ -34,31 +34,31 @@ proc {SemanticStack Stack Env}
    end
 end
 
-{Dictionary.removeAll SAS}
-
-{SemanticStack
- [var ident(x)
-  [
-   [var ident(y)
-    [
-     [var ident(z)
-      [
-	%[bind ident(z)
-	% [record literal(label)
-	%  [[literal(f1) ident(x)] [literal(f2) ident(y)]]] ]
-	%[bind ident(w)
-	 %[record literal(label)
-	  %[[literal(f1) literal(1)] [literal(f2) literal(2)]]] ]
-       [bind ident(x) literal(1)]
-       [bind ident(y) literal(2)]
-       [nop]
-      ]
-     ]
-     [nop]
-    ]
-   ]
-   [nop]
-  ]
- ] {Dictionary.new} }
- 
- {PprintSAS}
+%{Dictionary.removeAll SAS}
+%
+%{SemanticStack
+% [var ident(x)
+%  [
+%   [var ident(y)
+%    [
+%     [var ident(z)
+%      [
+%	%[bind ident(z)
+%	% [record literal(label)
+%	%  [[literal(f1) ident(x)] [literal(f2) ident(y)]]] ]
+%	%[bind ident(w)
+%	 %[record literal(label)
+%	  %[[literal(f1) literal(1)] [literal(f2) literal(2)]]] ]
+%       [bind ident(x) literal(1)]
+%       [bind ident(y) literal(2)]
+%       [nop]
+%      ]
+%     ]
+%     [nop]
+%    ]
+%   ]
+%   [nop]
+%  ]
+% ] {Dictionary.new} }
+% 
+% {PprintSAS}
