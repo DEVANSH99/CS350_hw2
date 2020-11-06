@@ -1,4 +1,4 @@
-\insert 'ProcessRecords.oz'
+\insert 'Desktop/CS350_hw2/ProcessRecords.oz'
 
 declare SAS AddToSAS RetrieveFromSAS BindRefToKeyInSAS BindValueToKeyInSAS WeakSubstitute EqualExp MergeAllInSAS MergeIfEqual UpdateSAS
 
