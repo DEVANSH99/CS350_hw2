@@ -1,7 +1,7 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack GetName
+declare SemanticStack GetName FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsEq
 
 fun {GetName X}
    {Length {Dictionary.keys SAS}}+1
@@ -33,6 +33,61 @@ proc {SemanticStack Stack Env}
    else skip
    end
 end
+
+fun {FV S}
+   case S
+   of skip then nil
+   [] ident(X) then [ident(X)]
+   [] [record L Xs] then {GetFVfromRec Xs}
+   [] [var ident(X) S1] then {Remove ident(X) {FV S1}}
+   [] [bind Exp1 Exp2] then {Union {FV Exp1} {FV Exp2}}
+   [] [match ident(X) P S1 S2] then {Union [ident(X)] {Union {SubtList {FV S1} {FV P}} {FV S2}}}
+   [] [procP IdentXs S1] then {SubtList {FV S1} IdentXs}
+   [] H|T then {Union {FV H} {FV T}}
+   else skip
+   end
+end
+
+fun {GetFVfromRec Xs}
+   case Xs
+   of nil then nil
+   [] H|T then {Union {FV H.2.1} {GetFVfromRec T}}
+   end
+end   
+
+fun {InsertIfNew X Xs}
+   if {List.member X Xs} then Xs else X|Xs end
+end
+
+fun {Remove X Xs}
+   {List.filter Xs {IsEq X}}
+end
+
+fun {Union Xs Ys}
+   case Ys
+   of nil then Xs
+   [] H|T then {Union {InsertIfNew H Xs} T}
+   end
+end
+
+fun {SubtList Xs Ys}
+   case Ys
+   of nil then Xs
+   [] H|T then {Sub {Remove H Xs} T}
+   end
+end
+
+fun {IsEq A}
+   fun {$ B}
+      A \= B
+   end
+end
+
+X = [1 2 3]
+{Browse {List.member 2 X}}
+{Browse {List.filter X {IsEq 3}}}
+
+
 
 %{Dictionary.removeAll SAS}
 %
