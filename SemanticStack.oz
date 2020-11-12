@@ -1,7 +1,7 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack GetName FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsEq
+declare SemanticStack GetName FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq
 
 fun {GetName X}
    {Length {Dictionary.keys SAS}}+1
@@ -65,7 +65,7 @@ fun {InsertIfNew X Xs}
 end
 
 fun {Remove X Xs}
-   {List.filter Xs {IsEq X}}
+   {List.filter Xs {IsNotEq X}}
 end
 
 fun {Union Xs Ys}
@@ -82,7 +82,7 @@ fun {SubtList Xs Ys}
    end
 end
 
-fun {IsEq A}
+fun {IsNotEq A}
    fun {$ B}
       A \= B
    end
