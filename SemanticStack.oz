@@ -44,15 +44,14 @@ end
 
 fun {FV S}
    case S
-   of skip then nil
+   of [nop] then nil
    [] ident(X) then [ident(X)]
-   [] [record L Xs] then {GetFVfromRec Xs}
+   [] [record _ Xs] then {GetFVfromRec Xs}
    [] [var ident(X) S1] then {Remove ident(X) {FV S1}}
    [] [bind Exp1 Exp2] then {Union {FV Exp1} {FV Exp2}}
    [] [match ident(X) P S1 S2] then {Union [ident(X)] {Union {SubtList {FV S1} {FV P}} {FV S2}}}
    [] [procP IdentXs S1] then {SubtList {FV S1} IdentXs} %procP is a temp name till sir makes the change
    [] H|T then {Union {FV H} {FV T}}
-   else skip
    end
 end
 
@@ -81,7 +80,7 @@ end
 fun {SubtList Xs Ys}
    case Ys
    of nil then Xs
-   [] H|T then {Sub {Remove H Xs} T}
+   [] H|T then {SubtList {Remove H Xs} T}
    end
 end
 
@@ -98,7 +97,7 @@ fun {MatchExp E1 E2}
       of literal(!A) then true
       else false % case of E2 being ident(A) has already been checked
       end % case E2
-   [] equivalence(X) then false % case of E2 being ident(A) has already been checked
+   [] equivalence(_) then false % case of E2 being ident(A) has already been checked
    [] record | L | Pairs1 then
       case E2
       of record | !L | Pairs2 then
@@ -113,7 +112,7 @@ fun {MatchExp E1 E2}
 		      if Y.2.1 == _ then true 
 		      else 
 			 case Y.2.1
-			 of ident(A) then true
+			 of ident(_) then true
 			 else {MatchExp {WeakSubstitute X.2.1} Y.2.1}
 			 end
 		      end
@@ -133,13 +132,11 @@ fun {MatchExp E1 E2}
    end % Case E1
 end %fun
 
-declare UpdateEnvForMatch PairwiseUpdateEnv
-
 proc {UpdateEnvForMatch Env E1 E2}
    case E1
    of literal(A) then
       case E2
-      of ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1 Env}}
+      of ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1}}
       else skip
       end
    [] equivalence(X) then
@@ -153,22 +150,22 @@ proc {UpdateEnvForMatch Env E1 E2}
 	 local Canon1 Canon2 Vals in
 	    Canon1 = {Canonize Pairs1.1}
 	    Canon2 = {Canonize Pairs2.1}
-	    {PairwiseUpdateEnv Canon1 Canon2}
+	    {PairwiseUpdateEnv Env Canon1 Canon2}
 	 end % local
-      [] ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1 Env}}
+      [] ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1 }}
       else skip
       end % Case E2
    end % Case E1
 end %fun
 
-proc {PairwiseUpdateEnv Xs Ys}
+proc {PairwiseUpdateEnv Env Xs Ys}
    case Xs#Ys
    of nil#nil then skip
    [] (X|T1)#(Y|T2) then
       if Y.2.1 == _ then skip
       else
-	 {UpdateEnvForMatch {WeakSubstitute X.2.1} Y.2.1}
-	 {PairwiseUpdateEnv T1 T2}
+	 {UpdateEnvForMatch Env {WeakSubstitute X.2.1} Y.2.1}
+	 {PairwiseUpdateEnv Env T1 T2}
       end
    end
 end
