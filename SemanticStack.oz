@@ -136,7 +136,7 @@ end %fun
 
 proc {UpdateEnvForMatch Env E1 E2}
    case E1
-   of literal(A) then
+   of literal(_) then
       case E2
       of ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1}}
       else skip
@@ -149,7 +149,7 @@ proc {UpdateEnvForMatch Env E1 E2}
    [] record | L | Pairs1 then
       case E2
       of record | !L | Pairs2 then
-	 local Canon1 Canon2 Vals in
+	 local Canon1 Canon2 in
 	    Canon1 = {Canonize Pairs1.1}
 	    Canon2 = {Canonize Pairs2.1}
 	    {PairwiseUpdateEnv Env Canon1 Canon2}
