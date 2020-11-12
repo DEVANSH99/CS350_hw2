@@ -1,7 +1,7 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack GetName FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq
+declare SemanticStack GetName FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq MatchExp UpdateEnvForMatch PairwiseUpdateEnv
 
 fun {GetName X}
    {Length {Dictionary.keys SAS}}+1
@@ -31,9 +31,16 @@ proc {SemanticStack Stack Env}
    [] [bind ident(X) [procP IdentXs S]] then 
       local Curr in
          Curr = {Dictionary.get SAS Env.X}
-         {Dictionary.put SAS Env.X ec(value: ([procP IdentXs S],{FV S}) es: Curr.es)}  %procP is a temp name till sir makes the change
+         {Dictionary.put SAS Env.X ec(value: p(1: [procP IdentXs S] 2: {SubtList {FV S} IdentXs}) es: Curr.es)}  %procP is a temp name till sir makes the change
       end
    [] [bind Exp1 Exp2] then {Unify Exp1 Exp2 Env}
+   [] [match ident(X) P S1 S2] then
+      local Env2 in
+	 Env2={Dictionary.clone Env}
+	 if {MatchExp {WeakSubstitute Env.X} P} then {SemanticStack S1 {UpdateEnvForMatch Env2 {WeakSubstitute Env.X} P}}
+	 else {SemanticStack S2 Env}
+	 end
+      end
    [] H|T then {SemanticStack H Env} {SemanticStack T Env}
    else skip
    end
@@ -87,6 +94,89 @@ fun {IsNotEq A}
       A \= B
    end
 end
+
+fun {MatchExp E1 E2}
+   case E1
+   of literal(A) then
+      case E2
+      of literal(!A) then true
+      else false % case of E2 being ident(A) has already been checked
+      end % case E2
+   [] equivalence(X) then false % case of E2 being ident(A) has already been checked
+   [] record | L | Pairs1 then
+      case E2
+      of record | !L | Pairs2 then
+	 local Canon1 Canon2 Vals in
+	    Canon1 = {Canonize Pairs1.1}
+	    Canon2 = {Canonize Pairs2.1}
+	    if {Length Canon1} == {Length Canon2} then
+	       Vals =
+	       {List.zip Canon1 Canon2
+		fun {$ X Y}
+		   if X.1 == Y.1 then
+		      if Y.2.1 == _ then true 
+		      else 
+			 case Y.2.1
+			 of ident(A) then true
+			 else {MatchExp {WeakSubstitute X.2.1} Y.2.1}
+			 end
+		      end
+		   else
+		      false
+		   end
+		end
+	       }
+	       {FoldL Vals fun {$ X Y} {And X Y} end true}
+	    else
+	       false
+	    end % if Length
+	 end % local
+      else 
+	 false
+      end % Case E2
+   end % Case E1
+end %fun
+
+declare UpdateEnvForMatch PairwiseUpdateEnv
+
+proc {UpdateEnvForMatch Env E1 E2}
+   case E1
+   of literal(A) then
+      case E2
+      of ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1 Env}}
+      else skip
+      end
+   [] equivalence(X) then
+      case E2
+      of ident(Y) then {Dictionary.put Env Y X}
+      else skip
+      end % case E2
+   [] record | L | Pairs1 then
+      case E2
+      of record | !L | Pairs2 then
+	 local Canon1 Canon2 Vals in
+	    Canon1 = {Canonize Pairs1.1}
+	    Canon2 = {Canonize Pairs2.1}
+	    {PairwiseUpdateEnv Canon1 Canon2}
+	 end % local
+      [] ident(Y) then {Dictionary.put Env Y {RetrieveKeySASByValue E1 Env}}
+      else skip
+      end % Case E2
+   end % Case E1
+end %fun
+
+proc {PairwiseUpdateEnv Xs Ys}
+   case Xs#Ys
+   of nil#nil then skip
+   [] (X|T1)#(Y|T2) then
+      if Y.2.1 == _ then skip
+      else
+	 {UpdateEnvForMatch {WeakSubstitute X.2.1} Y.2.1}
+	 {PairwiseUpdateEnv T1 T2}
+      end
+   end
+end
+
 
 %{Dictionary.removeAll SAS}
 %
