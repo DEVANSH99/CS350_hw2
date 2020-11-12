@@ -28,6 +28,11 @@ proc {SemanticStack Stack Env}
 	    {Dictionary.put Env X Name} {SemanticStack S Env} {Dictionary.remove Env X}
 	 end % Local Name
       end % if 
+   [] [bind ident(X) [procP IdentXs S]] then 
+      local Curr in
+         Curr = {Dictionary.get SAS Env.X}
+         {Dictionary.put SAS Env.X ec(value: ([procP IdentXs S],{FV S}) es: Curr.es)}  %procP is a temp name till sir makes the change
+      end
    [] [bind Exp1 Exp2] then {Unify Exp1 Exp2 Env}
    [] H|T then {SemanticStack H Env} {SemanticStack T Env}
    else skip
@@ -42,7 +47,7 @@ fun {FV S}
    [] [var ident(X) S1] then {Remove ident(X) {FV S1}}
    [] [bind Exp1 Exp2] then {Union {FV Exp1} {FV Exp2}}
    [] [match ident(X) P S1 S2] then {Union [ident(X)] {Union {SubtList {FV S1} {FV P}} {FV S2}}}
-   [] [procP IdentXs S1] then {SubtList {FV S1} IdentXs}
+   [] [procP IdentXs S1] then {SubtList {FV S1} IdentXs} %procP is a temp name till sir makes the change
    [] H|T then {Union {FV H} {FV T}}
    else skip
    end
@@ -82,12 +87,6 @@ fun {IsEq A}
       A \= B
    end
 end
-
-X = [1 2 3]
-{Browse {List.member 2 X}}
-{Browse {List.filter X {IsEq 3}}}
-
-
 
 %{Dictionary.removeAll SAS}
 %
