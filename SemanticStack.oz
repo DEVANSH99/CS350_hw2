@@ -1,7 +1,7 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack
+declare SemanticStack FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq
 
 proc {SemanticStack Stack Env}
    case Stack
@@ -24,9 +24,63 @@ proc {SemanticStack Stack Env}
 	    {Dictionary.put Env X Name} {SemanticStack S Env} {Dictionary.remove Env X}
 	 end % Local Name
       end % if 
+   [] [bind ident(X) [procP IdentXs S]] then 
+      local Curr in
+         Curr = {Dictionary.get SAS Env.X}
+         {Dictionary.put SAS Env.X ec(value: ([procP IdentXs S],{FV S}) es: Curr.es)}  %procP is a temp name till sir makes the change
+      end
    [] [bind Exp1 Exp2] then {Unify Exp1 Exp2 Env}
    [] H|T then {SemanticStack H Env} {SemanticStack T Env}
    else skip
+   end
+end
+
+fun {FV S}
+   case S
+   of skip then nil
+   [] ident(X) then [ident(X)]
+   [] [record L Xs] then {GetFVfromRec Xs}
+   [] [var ident(X) S1] then {Remove ident(X) {FV S1}}
+   [] [bind Exp1 Exp2] then {Union {FV Exp1} {FV Exp2}}
+   [] [match ident(X) P S1 S2] then {Union [ident(X)] {Union {SubtList {FV S1} {FV P}} {FV S2}}}
+   [] [procP IdentXs S1] then {SubtList {FV S1} IdentXs} %procP is a temp name till sir makes the change
+   [] H|T then {Union {FV H} {FV T}}
+   else skip
+   end
+end
+
+fun {GetFVfromRec Xs}
+   case Xs
+   of nil then nil
+   [] H|T then {Union {FV H.2.1} {GetFVfromRec T}}
+   end
+end   
+
+fun {InsertIfNew X Xs}
+   if {List.member X Xs} then Xs else X|Xs end
+end
+
+fun {Remove X Xs}
+   {List.filter Xs {IsNotEq X}}
+end
+
+fun {Union Xs Ys}
+   case Ys
+   of nil then Xs
+   [] H|T then {Union {InsertIfNew H Xs} T}
+   end
+end
+
+fun {SubtList Xs Ys}
+   case Ys
+   of nil then Xs
+   [] H|T then {Sub {Remove H Xs} T}
+   end
+end
+
+fun {IsNotEq A}
+   fun {$ B}
+      A \= B
    end
 end
 
