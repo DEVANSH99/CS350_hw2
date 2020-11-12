@@ -2,14 +2,51 @@
 
 declare SAS AddToSAS RetrieveFromSAS BindRefToKeyInSAS BindValueToKeyInSAS
 WeakSubstitute EqualExp MergeAllInSAS MergeIfEqual UpdateSAS PutValueInAllInSAS
+RetrieveKeySASByValue GetName
 PprintSAS
 
 SAS = {Dictionary.new}
+
+fun {GetName}
+   {Length {Dictionary.keys SAS}} + 1
+end
 
 %Add a fresh variable to the SAS
 proc {AddToSAS X}
    {Dictionary.put SAS X ec(value: nil es: [X])}
 end
+
+%Retrieve Key For A Value from the SAS
+fun {RetrieveKeySASByValue X}
+   case X
+   of equivalence(_) then
+      raise retrieveUnboundValue(X) end
+   else
+      skip
+   end
+   
+   local
+      fun {RetrieveAux X L}
+	 case L
+	 of nil then
+	    local Name in
+	       Name = {GetName}
+	       {Dictionary.put SAS Name ec(value:X es:[Name])}
+	       Name
+	    end
+	 [] H|T then
+	    if {EqualExp X {RetrieveFromSAS H}} then
+	       H
+	    else
+	       {RetrieveAux X T}
+	    end
+	 end
+      end
+   in
+      {RetrieveAux X {Dictionary.keys SAS}}
+   end
+end
+
 
 fun {RetrieveFromSAS X}
    local EC in
@@ -176,13 +213,14 @@ end % proc
 
 
 proc {BindValueToKeyInSAS X E}
-   local Ex in
+   local Ex Ek in
       case E
       of literal(_) then
 	 Ex = {Dictionary.get SAS X}
-	 if Ex.value == nil
-	 then
-        {PutValueInAllInSAS E Ex.es}
+	 if Ex.value == nil then
+	    Ek = {Dictionary.get SAS {RetrieveKeySASByValue E}}
+	    {PutValueInAllInSAS E Ex.es}
+	    {MergeAllInSAS {Append Ek.es Ex.es}}
 	 else
 	    raise notUndefined(X) end 
 	 end
@@ -194,7 +232,9 @@ proc {BindValueToKeyInSAS X E}
 	       %CanonSub = {Map Canon fun {$ X} {WeakSubstitute X.2.1}} 
 	       %Rec = [record L CanonSub]
 	       Rec = [record L Canon]
-           {PutValueInAllInSAS Rec Ex.es}
+	       Ek = {Dictionary.get SAS {RetrieveKeySASByValue Rec}}
+	       {PutValueInAllInSAS Rec Ex.es}
+	       {MergeAllInSAS {Append Ek.es Ex.es}}
 	    end
 	 else
 	    raise notUndefined(X) end

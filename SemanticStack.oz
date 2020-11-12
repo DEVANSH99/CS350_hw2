@@ -1,11 +1,7 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack GetName
-
-fun {GetName X}
-   {Length {Dictionary.keys SAS}}+1
-end
+declare SemanticStack
 
 proc {SemanticStack Stack Env}
    case Stack
@@ -16,14 +12,14 @@ proc {SemanticStack Stack Env}
       if {Dictionary.member Env X} then
 	 local Env2 Name in
 	    Env2={Dictionary.clone Env}
-	    Name={GetName X}
+	    Name={GetName}
 	       {Dictionary.put Env2 X Name}
 	    {AddToSAS Name}
 	    {SemanticStack S Env2}
 	 end %Local Env2 Name
       else
 	 local Name in
-	    Name={GetName X}
+	    Name={GetName}
 	    {AddToSAS Name}
 	    {Dictionary.put Env X Name} {SemanticStack S Env} {Dictionary.remove Env X}
 	 end % Local Name
