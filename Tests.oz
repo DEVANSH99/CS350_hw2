@@ -196,4 +196,30 @@ Test8 = [var ident(x)
 	 ]
 	]
 
-{RunTest Test7}
+%BINDING TESTCASE 9
+declare Test9
+Test9 = [var ident(x)
+	 [
+	  [var ident(y)
+	   [
+	    [
+	     var ident(q)
+	     [
+	      [bind ident(q) [procP [ident(x1) ident(x2)] [
+							   [bind ident(x1) ident(x)]
+							   [bind ident(x2) ident(y)]
+							   [nop]
+							  ]
+			     ]
+	      ]
+	      [nop]
+	     ]
+	    ]
+	    [nop]
+	   ]
+	  ]
+	  [nop]
+	 ]
+	]
+
+{RunTest Test9}

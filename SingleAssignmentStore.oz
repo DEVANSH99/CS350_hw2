@@ -188,7 +188,6 @@ proc {UpdateSAS}
 end
 
 proc {BindRefToKeyInSAS X Y}
-    {Browse 2}
    local EX EY in
       EX = {Dictionary.get SAS X}
       EY = {Dictionary.get SAS Y}

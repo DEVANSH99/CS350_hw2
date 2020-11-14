@@ -7,7 +7,7 @@ proc {SemanticStack Stack Env}
    case Stack
    of nil then skip
    [] [nop] then
-      {Browse {Dictionary.entries SAS}} {Browse {Dictionary.entries Env}}
+      skip
    [] [var ident(X) S] then
       if {Dictionary.member Env X} then
 	 local Env2 Name in
@@ -46,7 +46,8 @@ end
 
 fun {FV S}
    case S
-   of [nop] then nil
+   of nil then nil
+   [] [nop] then nil
    [] ident(X) then [ident(X)]
    [] [record _ Xs] then {GetFVfromRec Xs}
    [] [var ident(X) S1] then {Remove ident(X) {FV S1}}
