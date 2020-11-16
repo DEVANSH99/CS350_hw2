@@ -25,7 +25,6 @@ proc {SemanticStack Stack Env}
 	 end % Local Name
       end % if 
    [] [bind ident(X) [procP IdentXs S]] then 
-      local Curr in
       local Curr FVDict FVs in
          FVDict = {Dictionary.new}
          FVs = {SubtList {FV S} IdentXs}
