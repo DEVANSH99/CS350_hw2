@@ -1,7 +1,7 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq MatchExp UpdateEnvForMatch PairwiseUpdateEnv
+declare SemanticStack FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq MatchExp UpdateEnvForMatch PairwiseUpdateEnv InsertInFVDict
 
 proc {SemanticStack Stack Env}
    case Stack
@@ -26,8 +26,12 @@ proc {SemanticStack Stack Env}
       end % if 
    [] [bind ident(X) [procP IdentXs S]] then 
       local Curr in
+      local Curr FVDict FVs in
+         FVDict = {Dictionary.new}
+         FVs = {SubtList {FV S} IdentXs}
+         {InsertInFVDict FVDict FVs Env}
          Curr = {Dictionary.get SAS Env.X}
-         {Dictionary.put SAS Env.X ec(value: p(1: [procP IdentXs S] 2: {SubtList {FV S} IdentXs}) es: Curr.es)}  %procP is a temp name till sir makes the change
+         {Dictionary.put SAS Env.X ec(value: p(1: [procP IdentXs S] 2: FVDict) es: Curr.es)}  %procP is a temp name till sir makes the change
       end
    [] [bind Exp1 Exp2] then {Unify Exp1 Exp2 Env}
    [] [match ident(X) P S1 S2] then
@@ -173,7 +177,14 @@ proc {PairwiseUpdateEnv Env Xs Ys}
    end
 end
 
-
+proc {InsertInFVDict FVDict FVs Env}
+   case FVs
+   of nil then skip
+   [] ident(X)|T then
+      {Dictionary.put FVDict H Env.X}
+      {InsertInFVDict FVDict T Env}
+   end
+end
 %{Dictionary.removeAll SAS}
 %
 %{SemanticStack
