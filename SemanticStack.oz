@@ -1,13 +1,13 @@
 \insert 'SingleAssignmentStore.oz'
 \insert 'Unify.oz'
 
-declare SemanticStack FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq MatchExp UpdateEnvForMatch PairwiseUpdateEnv InsertInFVDict
+declare SemanticStack FV InsertIfNew GetFVfromRec InsertIfNew Remove Union SubtList IsNotEq MatchExp UpdateEnvForMatch PairwiseUpdateEnv InsertInFVDict UpdateEnvApply
 
 proc {SemanticStack Stack Env}
    case Stack
    of nil then skip
    [] [nop] then
-      skip
+      {Browse {Dictionary.entries SAS}}
    [] [var ident(X) S] then
       if {Dictionary.member Env X} then
 	 local Env2 Name in
@@ -30,7 +30,7 @@ proc {SemanticStack Stack Env}
          FVs = {SubtList {FV S} IdentXs}
          {InsertInFVDict FVDict FVs Env}
          Curr = {Dictionary.get SAS Env.X}
-         {Dictionary.put SAS Env.X ec(value: p(1: [procP IdentXs S] 2: FVDict) es: Curr.es)}  %procP is a temp name till sir makes the change
+         {Dictionary.put SAS Env.X ec(value: p(1: [procP IdentXs S] 2: FVDict) es: Curr.es)}  %procP change in syntax from hw file
       end
    [] [bind Exp1 Exp2] then {Unify Exp1 Exp2 Env}
    [] [match ident(X) P S1 S2] then
@@ -42,10 +42,27 @@ proc {SemanticStack Stack Env}
 	 else {SemanticStack S2 Env}
 	 end
       end
+   [] [apply ident(F) IdentXs] then 		%IdentXs change in syntax from hw file
+   		local Func Env2 in
+   			Func={Dictionary.condGet SAS Env.F ~1}
+   			if Func\=~1
+   			then case Func.value 
+   				 of p(1:[procP IdentYs S] 2:CE) then if {Length IdentXs}=={Length IdentYs}
+   				 									 then Env2 = {Dictionary.clone CE}
+   				 									 	  {UpdateEnvApply Env Env2 IdentYs IdentXs} 
+   				 									 	  {SemanticStack S Env2}
+   				 									 else raise notUndefined(F) end
+   				 									 end
+   				 else raise notUndefined(F) end
+   				 end
+   			else raise notUndefined(F) end
+   			end
+   		end 
    [] H|T then {SemanticStack H Env} {SemanticStack T Env}
    else skip
    end
 end
+
 
 fun {FV S}
    case S
@@ -138,6 +155,27 @@ fun {MatchExp E1 E2}
    end % Case E1
 end %fun
 
+proc {UpdateEnvApply Env1 Env2 Ys Xs}
+	case Ys
+	of nil then skip
+	else case Ys.1
+		 of ident(Q) then case Xs.1
+	     				  of ident(P) then {Browse P} {Browse Q}{Dictionary.put Env2 Q Env1.P} {UpdateEnvApply Env1 Env2 Ys.2 Xs.2}
+	     				  else local Name in
+	    	  						Name = {GetName}
+	    	  						{Browse Xs.1} {Browse ident(Q)}
+	    	  						{AddToSAS Name}
+	    	  						{Dictionary.put Env2 Q Name}
+	    	  						{Unify ident(Q) Xs.1 Env2}
+	    	  						{UpdateEnvApply Env1 Env2 Ys.2 Xs.2}
+	    	  			  	   end
+	    	  			  end
+	     else raise notUndefined(Ys.1) end
+	     end
+	 end
+end
+
+
 proc {UpdateEnvForMatch Env E1 E2}
    case E1
    of literal(_) then
@@ -180,10 +218,11 @@ proc {InsertInFVDict FVDict FVs Env}
    case FVs
    of nil then skip
    [] ident(X)|T then
-      {Dictionary.put FVDict H Env.X}
+      {Dictionary.put FVDict X Env.X}
       {InsertInFVDict FVDict T Env}
    end
 end
+
 %{Dictionary.removeAll SAS}
 %
 %{SemanticStack

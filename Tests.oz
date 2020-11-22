@@ -206,13 +206,12 @@ Test9 = [var ident(x)
 	     var ident(q)
 	     [
 	      [bind ident(q) [procP [ident(x1) ident(x2)] [
-							   [bind ident(x1) ident(x)]
-							   [bind ident(x2) ident(y)]
+							   [bind ident(x1) ident(x2)]
 							   [nop]
 							  ]
 			     ]
 	      ]
-	      [nop]
+	      [apply ident(q) [ident(y) literal(2)]]
 	     ]
 	    ]
 	    [nop]
