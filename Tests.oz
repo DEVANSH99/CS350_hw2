@@ -196,7 +196,7 @@ Test8 = [var ident(x)
 	 ]
 	]
 
-%BINDING TESTCASE 9
+%APPLY TESTCASE 9
 declare Test9
 Test9 = [var ident(x)
 	 [
@@ -211,6 +211,7 @@ Test9 = [var ident(x)
 							  ]
 			     ]
 	      ]
+	      [apply ident(q) [literal(2) ident(x)]]
 	      [apply ident(q) [ident(y) literal(2)]]
 	     ]
 	    ]
@@ -220,5 +221,75 @@ Test9 = [var ident(x)
 	  [nop]
 	 ]
 	]
+%APPLY TESTCASE 10
+declare Test10
+Test10 = [var ident(x)
+	 [
+	  [var ident(y)
+	   [
+	    [var ident(q)   [bind ident(x) [procP [ident(x1)] [
+							   [bind ident(x1) ident(q)]
+							   [nop]
+							  ]
+			     ]
+	      ]
+	    ]
+	    [nop]
+	   ]
+	  ]
+	  [apply ident(x) [literal(5)]]
+	 ]
+	]
 
-{RunTest Test9}
+%APPLY TESTCASE 11
+declare Test11
+Test11 = [var ident(x)
+	 [
+	  [var ident(y)
+	   [
+	    [
+	     var ident(q)
+	     [
+	      [bind ident(q) [procP [ident(x1) ident(x2)] [
+							   [bind ident(x1) ident(x2)]
+							   [nop]
+							  ]
+			     ]
+	      ]
+	      [apply ident(q) [literal(5) ident(y)]]
+	      [apply ident(q) [literal(2) ident(x)]]
+	     ]
+	    ]
+	    [nop]
+	   ]
+	  ]
+	  [nop]
+	 ]
+	 ]
+
+%APPLY TESTCASE 12
+declare Test12
+Test12 = [var ident(x)
+	 [
+	  [var ident(y)
+	   [
+	    [
+	     var ident(q)
+	     [
+	      [bind ident(q) [procP [ident(x1) ident(x2)] [
+							   [bind ident(x1) ident(x2)]
+							   [nop]
+							  ]
+			     ]
+	      ]
+	      [apply ident(q) [ident(x) ident(y)]]
+	     ]
+	    ]
+	    [nop]
+	   ]
+	  ]
+	  [nop]
+	 ]
+	 ]
+
+{RunTest Test12}
