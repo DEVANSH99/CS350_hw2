@@ -105,6 +105,8 @@ fun {EqualExp E1 E2}
       else 
 	 false
       end % Case E2
+   else
+      false
    end % Case E1
 end %fun
 
