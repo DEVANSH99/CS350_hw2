@@ -317,3 +317,49 @@ Test13 = [var ident(x)
 	]
 
 {RunTest Test13}
+
+%APPLY TESTCASE 14
+declare Test14
+Test14 = [var ident(x)
+	 [
+	  [var ident(y)
+	   [
+	    [
+	     var ident(z)
+	     [
+	      [bind ident(x) [record literal(a) [[literal(feature1) literal(10)]]]]
+	      [match ident(x) [record literal(b) [[literal(feature1) ident(y)]]] [bind ident(z) ident(y)] [bind ident(z) literal(20)]]
+	      [nop]
+	     ]
+	    ]
+	    [nop]
+	   ]
+	  ]
+	  [nop]
+	 ]
+	]
+
+{RunTest Test14}
+
+%APPLY TESTCASE 15
+declare Test15
+Test15 = [var ident(x)
+	 [
+	  [var ident(y)
+	   [
+	    [
+	     var ident(z)
+	     [
+	      [bind ident(x) [record literal(a) [[literal(feature1) literal(10)]]]]
+	      [match ident(x) [record literal(a) [[literal(feature2) ident(y)]]] [bind ident(z) ident(y)] [bind ident(z) literal(20)]]
+	      [nop]
+	     ]
+	    ]
+	    [nop]
+	   ]
+	  ]
+	  [nop]
+	 ]
+	]
+
+{RunTest Test15}
