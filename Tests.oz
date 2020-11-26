@@ -304,7 +304,7 @@ Test13 = [var ident(x)
 	    [
 	     var ident(z)
 	     [
-	      [bind ident(x) [record literal(a) [[literal(feature1) ident(10)]]]]
+	      [bind ident(x) [record literal(a) [[literal(feature1) literal(10)]]]]
 	      [match ident(x) [record literal(a) [[literal(feature1) ident(y)]]] [bind ident(z) ident(y)] [bind ident(z) literal(20)]]
 	      [nop]
 	     ]
