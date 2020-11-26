@@ -36,8 +36,8 @@ proc {SemanticStack Stack Env}
    [] [match ident(X) P S1 S2] then
       local Env2 in
 	 Env2={Dictionary.clone Env}
-	 if {MatchExp {WeakSubstitute Env.X} P} then 
-      {UpdateEnvForMatch Env2 {WeakSubstitute Env.X} P}
+	 if {MatchExp {RetrieveFromSAS Env.X} P} then 
+      {UpdateEnvForMatch Env2 {RetrieveFromSAS Env.X} P}
       {SemanticStack S1 Env2}
 	 else {SemanticStack S2 Env}
 	 end

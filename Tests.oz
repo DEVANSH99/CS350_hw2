@@ -292,9 +292,6 @@ Test12 = [var ident(x)
 	 ]
 	 ]
 
-{RunTest Test12}
-
-
 %APPLY TESTCASE 13
 declare Test13
 Test13 = [var ident(x)
@@ -305,7 +302,7 @@ Test13 = [var ident(x)
 	     var ident(z)
 	     [
 	      [bind ident(x) [record literal(a) [[literal(feature1) literal(10)]]]]
-	      [match ident(x) [record literal(a) [[literal(feature1) ident(y)]]] [bind ident(z) ident(y)] [bind ident(z) literal(20)]]
+	      [match ident(x) [record literal(a) [[literal(feature1) ident(y1)]]] [bind ident(z) ident(y1)] [bind ident(z) literal(20)]]
 	      [nop]
 	     ]
 	    ]
@@ -315,8 +312,6 @@ Test13 = [var ident(x)
 	  [nop]
 	 ]
 	]
-
-{RunTest Test13}
 
 %APPLY TESTCASE 14
 declare Test14
@@ -328,7 +323,7 @@ Test14 = [var ident(x)
 	     var ident(z)
 	     [
 	      [bind ident(x) [record literal(a) [[literal(feature1) literal(10)]]]]
-	      [match ident(x) [record literal(b) [[literal(feature1) ident(y)]]] [bind ident(z) ident(y)] [bind ident(z) literal(20)]]
+	      [match ident(x) [record literal(b) [[literal(feature1) ident(y1)]]] [bind ident(z) ident(y1)] [bind ident(z) literal(20)]]
 	      [nop]
 	     ]
 	    ]
@@ -338,8 +333,6 @@ Test14 = [var ident(x)
 	  [nop]
 	 ]
 	]
-
-{RunTest Test14}
 
 %APPLY TESTCASE 15
 declare Test15
@@ -351,7 +344,7 @@ Test15 = [var ident(x)
 	     var ident(z)
 	     [
 	      [bind ident(x) [record literal(a) [[literal(feature1) literal(10)]]]]
-	      [match ident(x) [record literal(a) [[literal(feature2) ident(y)]]] [bind ident(z) ident(y)] [bind ident(z) literal(20)]]
+	      [match ident(x) [record literal(a) [[literal(feature2) ident(y1)]]] [bind ident(z) ident(y1)] [bind ident(z) literal(20)]]
 	      [nop]
 	     ]
 	    ]
@@ -360,6 +353,6 @@ Test15 = [var ident(x)
 	  ]
 	  [nop]
 	 ]
-	]
+	 ]
 
-{RunTest Test15}
+{RunTest Test13}
