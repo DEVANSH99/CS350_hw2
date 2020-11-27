@@ -131,12 +131,15 @@ fun {MatchExp E1 E2}
 	       Vals =
 	       {List.zip Canon1 Canon2
 		fun {$ X Y}
+		   {Browse 1}
 		   if X.1 == Y.1 then
-		      if Y.2.1 == _ then true 
-		      else 
+		   	  {Browse 11}
+		      if Y.2.1 == '_' then true 
+		      else
 			 case Y.2.1
 			 of ident(_) then true
-			 else {MatchExp {WeakSubstitute X.2.1} Y.2.1}
+			 else 
+			 {MatchExp {WeakSubstitute X.2.1} Y.2.1}
 			 end
 		      end
 		   else
@@ -206,7 +209,7 @@ proc {PairwiseUpdateEnv Env Xs Ys}
    case Xs#Ys
    of nil#nil then skip
    [] (X|T1)#(Y|T2) then
-      if Y.2.1 == _ then skip
+      if Y.2.1 == '_' then skip
       else
 	 {UpdateEnvForMatch Env {WeakSubstitute X.2.1} Y.2.1}
 	 {PairwiseUpdateEnv Env T1 T2}
