@@ -131,9 +131,7 @@ fun {MatchExp E1 E2}
 	       Vals =
 	       {List.zip Canon1 Canon2
 		fun {$ X Y}
-		   {Browse 1}
 		   if X.1 == Y.1 then
-		   	  {Browse 11}
 		      if Y.2.1 == '_' then true 
 		      else
 			 case Y.2.1
@@ -163,10 +161,9 @@ proc {UpdateEnvApply Env1 Env2 Ys Xs}
 	of nil then skip
 	else case Ys.1
 		 of ident(Q) then case Xs.1
-	     				  of ident(P) then {Browse P} {Browse Q}{Dictionary.put Env2 Q Env1.P} {UpdateEnvApply Env1 Env2 Ys.2 Xs.2}
+	     				  of ident(P) then {Dictionary.put Env2 Q Env1.P} {UpdateEnvApply Env1 Env2 Ys.2 Xs.2}
 	     				  else local Name in
 	    	  						Name = {GetName}
-	    	  						{Browse Xs.1} {Browse ident(Q)}
 	    	  						{AddToSAS Name}
 	    	  						{Dictionary.put Env2 Q Name}
 	    	  						{Unify ident(Q) Xs.1 Env2}
